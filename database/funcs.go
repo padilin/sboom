@@ -92,22 +92,27 @@ func SaveRepo(repo Repo) (Repo, error) {
 // ensureDependency finds an existing dependency by name+version and reuses it,
 // or creates it if missing. On success the passed dependency will have its ID set.
 func ensureDependency(dep *Dependency) error {
-	if dep == nil {
-		return errors.New("nil dependency")
-	}
-	var existing Dependency
-	result := db.Where("name = ? AND version = ?", dep.Name, dep.Version).First(&existing)
-	if result.Error == nil {
-		// reuse existing ID so GORM treats this as an existing record
-		dep.ID = existing.ID
-		return nil
-	}
-	if result.Error != nil && !errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return result.Error
-	}
-	// Not found -> create the dependency row
-	if err := db.Create(dep).Error; err != nil {
-		return err
-	}
-	return nil
+    if dep == nil {
+        return errors.New("nil dependency")
+    }
+    var existing Dependency
+    result := db.Where("name = ? AND version = ?", dep.Name, dep.Version).First(&existing)
+    if result.Error == nil {
+        // reuse existing ID so GORM treats this as an existing record
+        dep.ID = existing.ID
+        return nil
+    }
+    if result.Error != nil {
+        if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+            // Log the debug message instead of returning an error
+            log.Printf("Dependency %s@%s not found, creating a new one.", dep.Name, dep.Version)
+        } else {
+            return result.Error
+        }
+    }
+    // Not found -> create the dependency row
+    if err := db.Create(dep).Error; err != nil {
+        return err
+    }
+    return nil
 }
