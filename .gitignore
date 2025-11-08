@@ -1,0 +1,33 @@
+# Go specific
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+
+# Go build and test cache
+/vendor/
+/bin/
+/pkg/
+/dist/
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+.history/
+
+# Go coverage results
+coverage.txt
+coverage.html
